@@ -44,13 +44,25 @@ namespace Valve.VR.InteractionSystem
 			Physics.IgnoreCollision( shaftRB.GetComponent<Collider>(), Player.instance.headCollider );
 		}
 
+		//function to make custom path.  Would do the different transformations here
+		//as of right now, just shifts by another vector component
+		//use mod = Vector(0,0,0) for vanilla behavior
+		Vector3 customDir(Vector3 mod)
+        {
+			transform.position = transform.position + mod;
+			return transform.position;
+        }
+
 
 		//-------------------------------------------------
 		void FixedUpdate()
 		{
 			if ( released && inFlight )
 			{
-				prevPosition = transform.position;
+				//witness the changes in the debug log
+				Debug.Log("position in: " + prevPosition.x.ToString() + ", " + prevPosition.y.ToString() + ", " + prevPosition.z.ToString());
+				prevPosition = customDir(new Vector3(2 * prevPosition.x * Time.deltaTime, 2 * prevPosition.y * Time.deltaTime, 0));
+				Debug.Log("position out: " + prevPosition.x.ToString() + ", " + prevPosition.y.ToString() + ", " + prevPosition.z.ToString());
 				prevRotation = transform.rotation;
 				prevVelocity = GetComponent<Rigidbody>().velocity;
 				prevHeadPosition = arrowHeadRB.transform.position;
