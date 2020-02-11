@@ -47,10 +47,15 @@ namespace Valve.VR.InteractionSystem
 		//function to make custom path.  Would do the different transformations here
 		//as of right now, just shifts by another vector component
 		//use mod = Vector(0,0,0) for vanilla behavior
-		Vector3 customDir(Vector3 mod)
+		Vector3 customVel(Vector3 mod)
         {
-			transform.position = transform.position + mod;
-			return transform.position;
+			//Nil Geometry: the higher you shoot, the more crazy the arrow is
+			GetComponent<Rigidbody>().velocity = new Vector3(
+				GetComponent<Rigidbody>().velocity.x, 
+				GetComponent<Rigidbody>().velocity.y, 
+				GetComponent<Rigidbody>().velocity.z - (prevPosition.x * GetComponent<Rigidbody>().velocity.y)
+				);
+			return GetComponent<Rigidbody>().velocity ;
         }
 
 
@@ -61,10 +66,10 @@ namespace Valve.VR.InteractionSystem
 			{
 				//witness the changes in the debug log
 				Debug.Log("position in: " + prevPosition.x.ToString() + ", " + prevPosition.y.ToString() + ", " + prevPosition.z.ToString());
-				prevPosition = customDir(new Vector3(2 * prevPosition.x * Time.deltaTime, 2 * prevPosition.y * Time.deltaTime, 0));
+				prevPosition = transform.position;
 				Debug.Log("position out: " + prevPosition.x.ToString() + ", " + prevPosition.y.ToString() + ", " + prevPosition.z.ToString());
 				prevRotation = transform.rotation;
-				prevVelocity = GetComponent<Rigidbody>().velocity;
+				prevVelocity = customVel(new Vector3(0, 0, 0));
 				prevHeadPosition = arrowHeadRB.transform.position;
 				travelledFrames++;
 			}
