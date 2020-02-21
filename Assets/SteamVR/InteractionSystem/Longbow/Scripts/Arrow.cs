@@ -5,6 +5,7 @@
 //=============================================================================
 
 using UnityEngine;
+using System;
 using System.Collections;
 
 namespace Valve.VR.InteractionSystem
@@ -31,9 +32,9 @@ namespace Valve.VR.InteractionSystem
 
 		private bool inFlight;
 		private bool released;
-		private bool hasSpreadFire = false;
+        private bool hasSpreadFire = false;
 
-		private int travelledFrames = 0;
+        private int travelledFrames = 0;
 
 		private GameObject scaleParentObject = null;
 
@@ -41,20 +42,24 @@ namespace Valve.VR.InteractionSystem
 		//-------------------------------------------------
 		void Start()
 		{
-			Physics.IgnoreCollision( shaftRB.GetComponent<Collider>(), Player.instance.headCollider );
+			Physics.IgnoreCollision(arrowHeadRB.GetComponent<Collider>(), Player.instance.headCollider );
 		}
 
-		//function to make custom path.  Would do the different transformations here
-		//as of right now, just shifts by another vector component
-		//use mod = Vector(0,0,0) for vanilla behavior
-		Vector3 customVel(Vector3 mod)
+		Vector3 velocityMapper(String mode)
         {
-			//Nil Geometry: the higher you shoot, the more crazy the arrow is
-			GetComponent<Rigidbody>().velocity = new Vector3(
-				GetComponent<Rigidbody>().velocity.x, 
-				GetComponent<Rigidbody>().velocity.y, 
-				GetComponent<Rigidbody>().velocity.z - (prevPosition.x * GetComponent<Rigidbody>().velocity.y)
-				);
+			switch(mode)
+            {
+				case "H2xR": //f(x,y,z) -> (x, y, e^z)
+					Debug.Log("modifier: " + Mathf.Exp(transform.position.z).ToString());
+					GetComponent<Rigidbody>().velocity = new Vector3(
+						GetComponent<Rigidbody>().velocity.x,
+						GetComponent<Rigidbody>().velocity.y,
+						GetComponent<Rigidbody>().velocity.z * Mathf.Exp(transform.position.z)
+						);
+					break;
+				default:
+					break;
+			}
 			return GetComponent<Rigidbody>().velocity ;
         }
 
@@ -65,11 +70,11 @@ namespace Valve.VR.InteractionSystem
 			if ( released && inFlight )
 			{
 				//witness the changes in the debug log
-				Debug.Log("position in: " + prevPosition.x.ToString() + ", " + prevPosition.y.ToString() + ", " + prevPosition.z.ToString());
+				Debug.Log("position: " + prevPosition.x.ToString() + ", " + prevPosition.y.ToString() + ", " + prevPosition.z.ToString());
+				Debug.Log("velocity: " + GetComponent<Rigidbody>().velocity.x.ToString() + ", " + GetComponent<Rigidbody>().velocity.y.ToString() + ", " + GetComponent<Rigidbody>().velocity.z.ToString());
 				prevPosition = transform.position;
-				Debug.Log("position out: " + prevPosition.x.ToString() + ", " + prevPosition.y.ToString() + ", " + prevPosition.z.ToString());
 				prevRotation = transform.rotation;
-				prevVelocity = customVel(new Vector3(0, 0, 0));
+				prevVelocity = velocityMapper("H2xR");
 				prevHeadPosition = arrowHeadRB.transform.position;
 				travelledFrames++;
 			}
@@ -109,7 +114,7 @@ namespace Valve.VR.InteractionSystem
 			prevPosition = transform.position;
 			prevRotation = transform.rotation;
 			prevHeadPosition = arrowHeadRB.transform.position;
-			prevVelocity = GetComponent<Rigidbody>().velocity;
+			prevVelocity = velocityMapper("H2xR");
 
             SetCollisionMode(CollisionDetectionMode.ContinuousDynamic);
 
@@ -137,54 +142,55 @@ namespace Valve.VR.InteractionSystem
 				bool canStick = ( targetPhysMaterial != null && collision.collider.sharedMaterial == targetPhysMaterial && rbSpeed > 0.2f );
 				bool hitBalloon = collision.collider.gameObject.GetComponent<Balloon>() != null;
 
-				if ( travelledFrames < 2 && !canStick )
-				{
-					// Reset transform but halve your velocity
-					transform.position = prevPosition - prevVelocity * Time.deltaTime;
-					transform.rotation = prevRotation;
+				// Old collision behavior
+                //if (travelledFrames < 2 && !canStick)
+                //{
+                //    // Reset transform but halve your velocity
+                //    transform.position = prevPosition - prevVelocity * Time.deltaTime;
+                //    transform.rotation = prevRotation;
 
-					Vector3 reflfectDir = Vector3.Reflect( arrowHeadRB.velocity, collision.contacts[0].normal );
-					arrowHeadRB.velocity = reflfectDir * 0.25f;
-					shaftRB.velocity = reflfectDir * 0.25f;
+                //    Vector3 reflfectDir = Vector3.Reflect(arrowHeadRB.velocity, collision.contacts[0].normal);
+                //    arrowHeadRB.velocity = reflfectDir * 0.25f;
+                //    shaftRB.velocity = reflfectDir * 0.25f;
 
-					travelledFrames = 0;
-					return;
-				}
+                //    travelledFrames = 0;
+                //    return;
+                //}
 
-				if ( glintParticle != null )
-				{
-					glintParticle.Stop( true );
-				}
+                if (glintParticle != null)
+                {
+                    glintParticle.Stop(true);
+                }
 
-				// Only play hit sounds if we're moving quickly
-				if ( rbSpeed > 0.1f )
-				{
-					hitGroundSound.Play();
-				}
+                // Only play hit sounds if we're moving quickly
+                if (rbSpeed > 0.1f)
+                {
+                    hitGroundSound.Play();
+                }
 
-				FireSource arrowFire = gameObject.GetComponentInChildren<FireSource>();
-				FireSource fireSourceOnTarget = collision.collider.GetComponentInParent<FireSource>();
+                FireSource arrowFire = gameObject.GetComponentInChildren<FireSource>();
+                FireSource fireSourceOnTarget = collision.collider.GetComponentInParent<FireSource>();
 
-				if ( arrowFire != null && arrowFire.isBurning && ( fireSourceOnTarget != null ) )
-				{
-					if ( !hasSpreadFire )
-					{
-						collision.collider.gameObject.SendMessageUpwards( "FireExposure", gameObject, SendMessageOptions.DontRequireReceiver );
-						hasSpreadFire = true;
-					}
-				}
-				else
-				{
-					// Only count collisions with good speed so that arrows on the ground can't deal damage
-					// always pop balloons
-					if ( rbSpeed > 0.1f || hitBalloon )
-					{
-						collision.collider.gameObject.SendMessageUpwards( "ApplyDamage", SendMessageOptions.DontRequireReceiver );
-						gameObject.SendMessage( "HasAppliedDamage", SendMessageOptions.DontRequireReceiver );
-					}
-				}
+                if (arrowFire != null && arrowFire.isBurning && (fireSourceOnTarget != null))
+                {
+                    if (!hasSpreadFire)
+                    {
+                        collision.collider.gameObject.SendMessageUpwards("FireExposure", gameObject, SendMessageOptions.DontRequireReceiver);
+                        hasSpreadFire = true;
+                    }
+                }
+                else
+                {
+                    // Only count collisions with good speed so that arrows on the ground can't deal damage
+                    // always pop balloons
+                    if (rbSpeed > 0.1f || hitBalloon)
+                    {
+                        collision.collider.gameObject.SendMessageUpwards("ApplyDamage", SendMessageOptions.DontRequireReceiver);
+                        gameObject.SendMessage("HasAppliedDamage", SendMessageOptions.DontRequireReceiver);
+                    }
+                }
 
-				if ( hitBalloon )
+                if ( hitBalloon )
 				{
 					// Revert my physics properties cause I don't want balloons to influence my travel
 					transform.position = prevPosition;
@@ -278,7 +284,7 @@ namespace Valve.VR.InteractionSystem
 			transform.parent = scaleParentObject.transform;
 			transform.rotation = prevRotation;
 			transform.position = prevPosition;
-			transform.position = collision.contacts[0].point - transform.forward * ( 0.75f - ( Util.RemapNumberClamped( prevVelocity.magnitude, 0f, 10f, 0.0f, 0.1f ) + Random.Range( 0.0f, 0.05f ) ) );
+			transform.position = collision.contacts[0].point - transform.forward * ( 0.75f - ( Util.RemapNumberClamped( prevVelocity.magnitude, 0f, 10f, 0.0f, 0.1f ) + UnityEngine.Random.Range( 0.0f, 0.05f ) ) );
 		}
 
 
