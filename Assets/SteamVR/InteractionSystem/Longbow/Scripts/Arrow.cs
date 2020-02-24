@@ -41,7 +41,7 @@ namespace Valve.VR.InteractionSystem
 		//-------------------------------------------------
 		void Start()
 		{
-			Physics.IgnoreCollision( shaftRB.GetComponent<Collider>(), Player.instance.headCollider );
+			Physics.IgnoreCollision( arrowHeadRB.GetComponent<Collider>(), Player.instance.headCollider );
 		}
 
 		//function to make custom path.  Would do the different transformations here
@@ -52,8 +52,8 @@ namespace Valve.VR.InteractionSystem
 			//Nil Geometry: the higher you shoot, the more crazy the arrow is
 			GetComponent<Rigidbody>().velocity = new Vector3(
 				GetComponent<Rigidbody>().velocity.x, 
-				GetComponent<Rigidbody>().velocity.y, 
-				GetComponent<Rigidbody>().velocity.z - (prevPosition.x * GetComponent<Rigidbody>().velocity.y)
+				GetComponent<Rigidbody>().velocity.y+2,
+				GetComponent<Rigidbody>().velocity.z 
 				);
 			return GetComponent<Rigidbody>().velocity ;
         }
@@ -123,8 +123,9 @@ namespace Valve.VR.InteractionSystem
             {
                 if (rigidBodies[rigidBodyIndex].isKinematic == false || force)
                     rigidBodies[rigidBodyIndex].collisionDetectionMode = newMode;
-            }
-        }
+		}
+
+		}
 
 
 		//-------------------------------------------------
