@@ -19,6 +19,9 @@ namespace Valve.VR.InteractionSystem
 
 		public PhysicMaterial targetPhysMaterial;
 
+		private Vector3 releasedLocation;
+		private float timeReleased;
+
 		private Vector3 prevPosition;
 		private Quaternion prevRotation;
 		private Vector3 prevVelocity;
@@ -57,6 +60,20 @@ namespace Valve.VR.InteractionSystem
 						GetComponent<Rigidbody>().velocity.z * Mathf.Exp(transform.position.z)
 						);
 					break;
+				case "Float":
+					GetComponent<Rigidbody>().drag = 0;
+					GetComponent<Rigidbody>().angularDrag = 0;
+					GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
+					float relativeTime = Time.timeSinceLevelLoad - timeReleased;
+					Vector3 relativePosition = new Vector3(0.01f * Mathf.Sin(relativeTime), 0, 0.01f * Mathf.Cos(relativeTime));
+					transform.position = transform.position + relativePosition;
+					break;
+				case "R^3": //f(x,y,z) -> (x, y, z)
+					GetComponent<Rigidbody>().velocity = new Vector3(
+						GetComponent<Rigidbody>().velocity.x,
+						GetComponent<Rigidbody>().velocity.y,
+						GetComponent<Rigidbody>().velocity.z);
+					break;
 				default:
 					break;
 			}
@@ -74,7 +91,7 @@ namespace Valve.VR.InteractionSystem
 				Debug.Log("velocity: " + GetComponent<Rigidbody>().velocity.x.ToString() + ", " + GetComponent<Rigidbody>().velocity.y.ToString() + ", " + GetComponent<Rigidbody>().velocity.z.ToString());
 				prevPosition = transform.position;
 				prevRotation = transform.rotation;
-				prevVelocity = velocityMapper("H2xR");
+				prevVelocity = velocityMapper("Float");
 				prevHeadPosition = arrowHeadRB.transform.position;
 				travelledFrames++;
 			}
@@ -114,7 +131,7 @@ namespace Valve.VR.InteractionSystem
 			prevPosition = transform.position;
 			prevRotation = transform.rotation;
 			prevHeadPosition = arrowHeadRB.transform.position;
-			prevVelocity = velocityMapper("H2xR");
+			prevVelocity = velocityMapper("Float");
 
             SetCollisionMode(CollisionDetectionMode.ContinuousDynamic);
 
