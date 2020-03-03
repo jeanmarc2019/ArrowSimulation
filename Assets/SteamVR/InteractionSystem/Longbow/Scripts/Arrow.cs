@@ -45,7 +45,6 @@ namespace Valve.VR.InteractionSystem
 		//-------------------------------------------------
 		void Start()
 		{
-<<<<<<< HEAD
 			Physics.IgnoreCollision(arrowHeadRB.GetComponent<Collider>(), Player.instance.headCollider );
 		}
 
@@ -53,15 +52,6 @@ namespace Valve.VR.InteractionSystem
         {
 			switch(mode)
             {
-=======
-			Physics.IgnoreCollision(arrowHeadRB.GetComponent<Collider>(), Player.instance.headCollider);
-		}
-
-		Vector3 velocityMapper(String mode)
-		{
-			switch (mode)
-			{
->>>>>>> menudemo
 				case "H2xR": //f(x,y,z) -> (x, y, e^z)
 					Debug.Log("modifier: " + Mathf.Exp(transform.position.z).ToString());
 					GetComponent<Rigidbody>().velocity = new Vector3(
@@ -70,7 +60,6 @@ namespace Valve.VR.InteractionSystem
 						GetComponent<Rigidbody>().velocity.z * Mathf.Exp(transform.position.z)
 						);
 					break;
-<<<<<<< HEAD
 				case "Float":
 					GetComponent<Rigidbody>().drag = 0;
 					GetComponent<Rigidbody>().angularDrag = 0;
@@ -79,26 +68,11 @@ namespace Valve.VR.InteractionSystem
 					Vector3 relativePosition = new Vector3(0.01f * Mathf.Sin(relativeTime), 0, 0.01f * Mathf.Cos(relativeTime));
 					transform.position = transform.position + relativePosition;
 					break;
-=======
-				default:
->>>>>>> menudemo
-				case "R^3": //f(x,y,z) -> (x, y, z)
-					GetComponent<Rigidbody>().velocity = new Vector3(
-						GetComponent<Rigidbody>().velocity.x,
-						GetComponent<Rigidbody>().velocity.y,
-						GetComponent<Rigidbody>().velocity.z);
-					break;
-<<<<<<< HEAD
 				default:
 					break;
 			}
 			return GetComponent<Rigidbody>().velocity ;
         }
-=======
-			}
-			return GetComponent<Rigidbody>().velocity;
-		}
->>>>>>> menudemo
 
 
 		//-------------------------------------------------
@@ -111,11 +85,7 @@ namespace Valve.VR.InteractionSystem
 				Debug.Log("velocity: " + GetComponent<Rigidbody>().velocity.x.ToString() + ", " + GetComponent<Rigidbody>().velocity.y.ToString() + ", " + GetComponent<Rigidbody>().velocity.z.ToString());
 				prevPosition = transform.position;
 				prevRotation = transform.rotation;
-<<<<<<< HEAD
 				prevVelocity = velocityMapper("Float");
-=======
-				prevVelocity = velocityMapper("H2xR");
->>>>>>> menudemo
 				prevHeadPosition = arrowHeadRB.transform.position;
 				travelledFrames++;
 			}
