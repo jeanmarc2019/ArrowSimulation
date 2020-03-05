@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/barebonesSimulator.unity
+    guid: 7c91f5f0031f7574cbcabaa0e5a0f916
+  - enabled: 1
+    path: Assets/Scenes/Game.unity
+    guid: 4b8afb676f8ed33479be8c7dd481b377
   m_configObjects: {}

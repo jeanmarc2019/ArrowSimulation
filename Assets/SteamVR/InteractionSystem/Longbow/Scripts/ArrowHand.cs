@@ -237,14 +237,17 @@ namespace Valve.VR.InteractionSystem
 			arrow.arrowHeadRB.useGravity = true;
 			arrow.arrowHeadRB.transform.GetComponent<BoxCollider>().enabled = true;
 
-			arrow.arrowHeadRB.AddForce( currentArrow.transform.forward * bow.GetArrowVelocity(), ForceMode.VelocityChange );
-			arrow.arrowHeadRB.AddTorque( currentArrow.transform.forward * 10 );
+            //arrow.arrowHeadRB.AddForce( currentArrow.transform.forward * bow.GetArrowVelocity(), ForceMode.VelocityChange );
+            //arrow.arrowHeadRB.AddTorque( currentArrow.transform.forward * 10 );
+            arrow.arrowHeadRB.AddForce(new Vector3(0f,0f,0f), 0);
+            arrow.arrowHeadRB.AddTorque(new Vector3(0f, 0f, 0f));
 
-			nocked = false;
+            nocked = false;
             nockedWithType = GrabTypes.None;
 
-			currentArrow.GetComponent<Arrow>().ArrowReleased( bow.GetArrowVelocity() );
-			bow.ArrowReleased();
+            //currentArrow.GetComponent<Arrow>().ArrowReleased( bow.GetArrowVelocity() );
+            currentArrow.GetComponent<Arrow>().ArrowReleased(0f);
+            bow.ArrowReleased();
 
 			allowArrowSpawn = false;
 			Invoke( "EnableArrowSpawn", 0.5f );
@@ -265,19 +268,31 @@ namespace Valve.VR.InteractionSystem
 		//-------------------------------------------------
 		private IEnumerator ArrowReleaseHaptics()
 		{
-			yield return new WaitForSeconds( 0.05f );
+            //yield return new WaitForSeconds( 0.05f );
 
-			hand.otherHand.TriggerHapticPulse( 1500 );
-			yield return new WaitForSeconds( 0.05f );
+            //hand.otherHand.TriggerHapticPulse( 1500 );
+            //yield return new WaitForSeconds( 0.05f );
 
-			hand.otherHand.TriggerHapticPulse( 800 );
-			yield return new WaitForSeconds( 0.05f );
+            //hand.otherHand.TriggerHapticPulse( 800 );
+            //yield return new WaitForSeconds( 0.05f );
 
-			hand.otherHand.TriggerHapticPulse( 500 );
-			yield return new WaitForSeconds( 0.05f );
+            //hand.otherHand.TriggerHapticPulse( 500 );
+            //yield return new WaitForSeconds( 0.05f );
 
-			hand.otherHand.TriggerHapticPulse( 300 );
-		}
+            //hand.otherHand.TriggerHapticPulse( 300 );
+            yield return new WaitForSeconds(0.05f);
+
+            hand.otherHand.TriggerHapticPulse(0);
+            yield return new WaitForSeconds(0.05f);
+
+            hand.otherHand.TriggerHapticPulse(0);
+            yield return new WaitForSeconds(0.05f);
+
+            hand.otherHand.TriggerHapticPulse(0);
+            yield return new WaitForSeconds(0.05f);
+
+            hand.otherHand.TriggerHapticPulse(0);
+        }
 
 
 		//-------------------------------------------------

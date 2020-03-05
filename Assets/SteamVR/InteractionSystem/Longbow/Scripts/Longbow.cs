@@ -37,7 +37,7 @@ namespace Valve.VR.InteractionSystem
 		public bool nocked;
 		public bool pulled;
 
-		private const float minPull = 0.05f;
+		private const float minPull = 0.00f;
 		private const float maxPull = 0.5f;
 		private float nockDistanceTravelled = 0f;
 		private float hapticDistanceThreshold = 0.01f;
@@ -46,9 +46,10 @@ namespace Valve.VR.InteractionSystem
 		private const float bowPullPulseStrengthHigh = 500;
 		private Vector3 bowLeftVector;
 
-		public float arrowMinVelocity = 3f;
+		public float arrowMinVelocity = 0f;
 		public float arrowMaxVelocity = 30f;
 		private float arrowVelocity = 30f;
+		private float arrowVelocityNew = 30f;
 
 		private float minStrainTickTime = 0.1f;
 		private float maxStrainTickTime = 0.5f;
@@ -71,12 +72,18 @@ namespace Valve.VR.InteractionSystem
 		private Quaternion lateUpdateRot;
 
 		public SoundBowClick drawSound;
-		private float drawTension;
+		public float drawTension;
 		public SoundPlayOneshot arrowSlideSound;
 		public SoundPlayOneshot releaseSound;
 		public SoundPlayOneshot nockSound;
 
 		SteamVR_Events.Action newPosesAppliedAction;
+
+		public float getDrawTension()
+        {
+			return this.drawTension;
+        }
+
 
 
 		//-------------------------------------------------
@@ -124,7 +131,9 @@ namespace Valve.VR.InteractionSystem
 
 					nockDistanceTravelled = -nockTransform.localPosition.z;
 
-					arrowVelocity = Util.RemapNumber( nockDistanceTravelled, minPull, maxPull, arrowMinVelocity, arrowMaxVelocity );
+					arrowVelocity = Util.RemapNumber(nockDistanceTravelled, minPull, maxPull, arrowMinVelocity, arrowMaxVelocity);
+
+					arrowVelocityNew = Util.RemapNumber(0, 0, 0, 0, 0);
 
 					drawTension = Util.RemapNumberClamped( nockDistanceTravelled, 0, maxPull, 0f, 1f );
 
@@ -225,7 +234,7 @@ namespace Valve.VR.InteractionSystem
 		//-------------------------------------------------
 		public float GetArrowVelocity()
 		{
-			return arrowVelocity;
+			return arrowVelocityNew;
 		}
 
 
