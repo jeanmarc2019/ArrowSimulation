@@ -48,7 +48,8 @@ namespace Valve.VR.InteractionSystem
 
 		public float arrowMinVelocity = 3f;
 		public float arrowMaxVelocity = 30f;
-		private float arrowVelocity = 30f;
+		private float savedArrowSpeed = 0f;
+		private float arrowVelocity = 0f;
 
 		private float minStrainTickTime = 0.1f;
 		private float maxStrainTickTime = 0.5f;
@@ -124,7 +125,11 @@ namespace Valve.VR.InteractionSystem
 
 					nockDistanceTravelled = -nockTransform.localPosition.z;
 
-					arrowVelocity = Util.RemapNumber( nockDistanceTravelled, minPull, maxPull, arrowMinVelocity, arrowMaxVelocity );
+//					savedArrowSpeed = Util.RemapNumber( nockDistanceTravelled, minPull, maxPull, arrowMinVelocity, arrowMaxVelocity );
+
+					arrowVelocity = 3.1415911111f;
+
+
 
 					drawTension = Util.RemapNumberClamped( nockDistanceTravelled, 0, maxPull, 0f, 1f );
 
