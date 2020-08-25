@@ -7,6 +7,7 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using GeometryMapper;
 
 namespace Valve.VR.InteractionSystem
 {
@@ -20,6 +21,7 @@ namespace Valve.VR.InteractionSystem
 		public PhysicMaterial targetPhysMaterial;
 
 		private Vector3 releasedLocation;
+		private Vector3 initialDirection;
 		private float timeReleased;
 
 		private Vector3 prevPosition;
@@ -48,44 +50,28 @@ namespace Valve.VR.InteractionSystem
 			Physics.IgnoreCollision(arrowHeadRB.GetComponent<Collider>(), Player.instance.headCollider );
 		}
 
-		Vector3 velocityMapper(String mode)
-        {
-			switch(mode)
-            {
-				case "H2xR": //f(x,y,z) -> (x, y, e^z)
-					Debug.Log("modifier: " + Mathf.Exp(transform.position.z).ToString());
-					GetComponent<Rigidbody>().velocity = new Vector3(
-						GetComponent<Rigidbody>().velocity.x,
-						GetComponent<Rigidbody>().velocity.y,
-						GetComponent<Rigidbody>().velocity.z * Mathf.Exp(transform.position.z)
-						);
-					break;
-				case "Float":
-					GetComponent<Rigidbody>().drag = 0;
-					GetComponent<Rigidbody>().angularDrag = 0;
-					GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
-					float relativeTime = Time.timeSinceLevelLoad - timeReleased;
-					Vector3 relativePosition = new Vector3(0.01f * Mathf.Sin(relativeTime), 0, 0.01f * Mathf.Cos(relativeTime));
-					transform.position = transform.position + relativePosition;
-					break;
-				default:
-					break;
-			}
-			return GetComponent<Rigidbody>().velocity ;
-        }
-
-
 		//-------------------------------------------------
 		void FixedUpdate()
 		{
 			if (released && inFlight)
 			{
+                float time_since_release = Time.time - timeReleased;
 				//witness the changes in the debug log
 				Debug.Log("position: " + prevPosition.x.ToString() + ", " + prevPosition.y.ToString() + ", " + prevPosition.z.ToString());
 				Debug.Log("velocity: " + GetComponent<Rigidbody>().velocity.x.ToString() + ", " + GetComponent<Rigidbody>().velocity.y.ToString() + ", " + GetComponent<Rigidbody>().velocity.z.ToString());
+				transform.position = GeometryMapper.PhysicsHelper.ArrowFromElsewhere(
+                            releasedLocation,
+                            initialDirection,
+                            time_since_release
+                        );
 				prevPosition = transform.position;
 				prevRotation = transform.rotation;
-				prevVelocity = velocityMapper("Float");
+				GetComponent<Rigidbody>().velocity = GeometryMapper.PhysicsHelper.derivateApprox(
+                            releasedLocation,
+                            initialDirection,
+                            time_since_release
+                        );
+				prevVelocity = GetComponent<Rigidbody>().velocity;
 				prevHeadPosition = arrowHeadRB.transform.position;
 				travelledFrames++;
 			}
@@ -95,6 +81,7 @@ namespace Valve.VR.InteractionSystem
 		//-------------------------------------------------
 		public void ArrowReleased(float inputVelocity)
 		{
+            timeReleased = Time.time;
 			inFlight = true;
 			released = true;
 
@@ -125,7 +112,9 @@ namespace Valve.VR.InteractionSystem
 			prevPosition = transform.position;
 			prevRotation = transform.rotation;
 			prevHeadPosition = arrowHeadRB.transform.position;
-			prevVelocity = velocityMapper("Float");
+			prevVelocity = GetComponent<Rigidbody>().velocity;
+            initialDirection = transform.forward;
+            releasedLocation = transform.position;
 
 			SetCollisionMode(CollisionDetectionMode.ContinuousDynamic);
 
