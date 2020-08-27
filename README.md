@@ -1,7 +1,7 @@
 <h1>MEGL Fall 2020 Deliverable</h1>
 
 <p>By Jacob Schreiber, Kevin Troung, Jean-Marc Daviau-Williams</p>
-<p>Fall 2020 Team: Sam Wells</p>
+<p>Fall 2020 Team: Sam Wells, Taylor Fountain</p>
 <p>Under supervision of Anton Lukyanenko</p>
 
 <h2>Saving Work to Repository</h2>
