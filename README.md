@@ -1,4 +1,4 @@
-<h1>MEGL Spring 2020 Deliverable</h1>
+<h1>MEGL Fall 2020 Deliverable</h1>
 
 <p>By Jacob Schreiber, Kevin Troung, Jean-Marc Daviau-Williams</p>
 <p>Fall 2020 Team: Sam Wells</p>
