@@ -17,7 +17,7 @@ To retrieve the project files from the remote repository, you need to:
 1.  launch git bash
 2.  navigate to the place where you want to put your project files
 3.  clone the remote with:
-`git@git.gmu.edu:gadig/collateral-damage.git`
+'git@github.com:jeanmarc2019/ArrowSimulation.git'
 
 ## Setting up Core for Source Control
 
